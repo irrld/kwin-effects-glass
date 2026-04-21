@@ -33,10 +33,10 @@
             <default>#00000000</default>
         </entry>
         <entry name="GlowColor" type="String">
-            <default>#00000000</default>
+            <default>#99FFFFFF</default>
         </entry>
         <entry name="BlurStrength" type="Int">
-            <default>15</default>
+            <default>10</default>
         </entry>
         <entry name="BlurFinetune" type="Int">
             <default>3</default>
@@ -45,7 +45,7 @@
             <default>true</default>
         </entry>
         <entry name="NoiseStrength" type="Int">
-            <default>5</default>
+            <default>2</default>
         </entry>
         <entry name="DecorationBlurStrength" type="Int">
             <default>15</default>
@@ -63,9 +63,8 @@
             <default>false</default>
         </entry>
         <entry name="WindowClasses" type="String">
-            <default>class1
-class2
-class3</default>
+            <default>plasmashell
+org.kde.konsole</default>
         </entry>
         <entry name="BlurMatching" type="Bool">
             <default>true</default>
@@ -149,16 +148,16 @@ class3</default>
             <default>1.0</default>
         </entry>
         <entry name="RefractionNormalPow" type="Double">
-            <default>2.0</default>
+            <default>4.0</default>
         </entry>
         <entry name="RefractionStrength" type="Double">
-            <default>0.0</default>
+            <default>12.0</default>
         </entry>
         <entry name="RefractionEdgeSize" type="Double">
-            <default>20.0</default>
+            <default>4.0</default>
         </entry>
         <entry name="RefractionRGBFringing" type="Double">
-            <default>1.0</default>
+            <default>6.0</default>
         </entry>
         <entry name="RefractionOffsetStrength" type="Double">
             <default>8.0</default>
