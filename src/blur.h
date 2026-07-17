@@ -167,6 +167,7 @@ private:
         int boxLocation;
         int cornerRadiusLocation;
         int opacityLocation;
+        int texUnitLocation;
 
         int blurSizeLocation;
         int edgeSizePixelsLocation;
@@ -178,7 +179,9 @@ private:
         int physicallyBasedRefractionLocation;
 
         int tintColorLocation;
+        int tintGrayLocation;
         int tintStrengthLocation;
+        int autoTintAlphaLocation;
 
         int glowColorLocation;
         int glowStrengthLocation;

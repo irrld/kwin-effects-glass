@@ -1,5 +1,7 @@
 uniform vec3 tintColor;
+uniform float tintGray;
 uniform float tintStrength;
+uniform int autoTintAlpha;
 uniform vec3 glowColor;
 uniform float glowStrength;
 uniform int edgeLighting;
@@ -76,10 +78,10 @@ GlassFragment glassRefraction(vec2 position, vec2 halfBlurSize, vec4 cornerRadiu
     vec2 coordB = clamp(uv - refractOffsetB, 0.0, 1.0);
 
     vec4 color = vec4(
-        TEXTURE(texUnit, coordR).r,
-        TEXTURE(texUnit, coordG).g,
-        TEXTURE(texUnit, coordB).b,
-        TEXTURE(texUnit, coordG).a
+        texture(texUnit, coordR).r,
+        texture(texUnit, coordG).g,
+        texture(texUnit, coordB).b,
+        texture(texUnit, coordG).a
     );
     return GlassFragment(color, dist, edgeFactor, concaveFactor, vec3(0.0, 0.0, 1.0), 1.0);
 }
@@ -109,6 +111,21 @@ vec3 glassOutline(vec2 position, GlassFragment s)
     return glow;
 }
 
+float adjustedTintStrength(float baseTintStrength, vec3 backgroundColor)
+{
+    float strength = clamp(baseTintStrength, 0.0, 1.0);
+
+    const vec3 grayscaleWeights = vec3(0.299, 0.587, 0.114);
+    float backgroundGray = dot(backgroundColor, grayscaleWeights);
+
+    float finalScale = clamp(abs(backgroundGray - tintGray), 0.0, 1.0);
+
+    float localStrength = strength * finalScale;
+    float useLocal = step(0.5, float(autoTintAlpha)) * step(0.001, strength);
+
+    return mix(strength, localStrength, useLocal);
+}
+
 vec4 glass(vec4 sum, vec4 cornerRadius)
 {
     vec2 halfBlurSize = blurSize * 0.5;
@@ -136,6 +153,6 @@ vec4 glass(vec4 sum, vec4 cornerRadius)
     }
 
     vec3 rgb = s.concaveFactor < 1.0 ? glassOutline(position, s) : s.color.rgb;
-    vec3 tinted = mix(rgb, tintColor, clamp(tintStrength, 0.0, 1.0));
+    vec3 tinted = mix(rgb, tintColor, adjustedTintStrength(tintStrength, rgb));
     return roundedRectangle(uv * blurSize, tinted, cornerRadius);
 }

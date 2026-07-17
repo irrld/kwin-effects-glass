@@ -119,8 +119,8 @@ BlurEffect::BlurEffect()
     ensureResources();
 
     m_roundedOnscreenPass.shader = ShaderManager::instance()->generateShaderFromFile(ShaderTrait::MapTexture,
-                                                                                     QStringLiteral(":/effects/glass/generated/onscreen_rounded_core.vert"),
-                                                                                     QStringLiteral(":/effects/glass/generated/onscreen_rounded_core.frag"));
+                                                                                     QStringLiteral(":/effects/glass/generated/onscreen_rounded.vert"),
+                                                                                     QStringLiteral(":/effects/glass/generated/onscreen_rounded.frag"));
     if (!m_roundedOnscreenPass.shader) {
         qCWarning(KWIN_BLUR) << "Failed to load onscreen pass shader";
         return;
@@ -134,6 +134,7 @@ BlurEffect::BlurEffect()
         m_roundedOnscreenPass.boxLocation = m_roundedOnscreenPass.shader->uniformLocation("box");
         m_roundedOnscreenPass.cornerRadiusLocation = m_roundedOnscreenPass.shader->uniformLocation("cornerRadius");
         m_roundedOnscreenPass.opacityLocation = m_roundedOnscreenPass.shader->uniformLocation("opacity");
+        m_roundedOnscreenPass.texUnitLocation = m_roundedOnscreenPass.shader->uniformLocation("texUnit");
         m_roundedOnscreenPass.blurSizeLocation = m_roundedOnscreenPass.shader->uniformLocation("blurSize");
         m_roundedOnscreenPass.edgeSizePixelsLocation = m_roundedOnscreenPass.shader->uniformLocation("edgeSizePixels");
         m_roundedOnscreenPass.refractionStrengthLocation = m_roundedOnscreenPass.shader->uniformLocation("refractionStrength");
@@ -143,7 +144,9 @@ BlurEffect::BlurEffect()
         m_roundedOnscreenPass.refractionBevelIntensityLocation = m_roundedOnscreenPass.shader->uniformLocation("refractionBevelIntensity");
         m_roundedOnscreenPass.physicallyBasedRefractionLocation = m_roundedOnscreenPass.shader->uniformLocation("physicallyBasedRefraction");
         m_roundedOnscreenPass.tintColorLocation = m_roundedOnscreenPass.shader->uniformLocation("tintColor");
+        m_roundedOnscreenPass.tintGrayLocation = m_roundedOnscreenPass.shader->uniformLocation("tintGray");
         m_roundedOnscreenPass.tintStrengthLocation = m_roundedOnscreenPass.shader->uniformLocation("tintStrength");
+        m_roundedOnscreenPass.autoTintAlphaLocation = m_roundedOnscreenPass.shader->uniformLocation("autoTintAlpha");
         m_roundedOnscreenPass.glowColorLocation = m_roundedOnscreenPass.shader->uniformLocation("glowColor");
         m_roundedOnscreenPass.glowStrengthLocation = m_roundedOnscreenPass.shader->uniformLocation("glowStrength");
         m_roundedOnscreenPass.edgeLightingLocation = m_roundedOnscreenPass.shader->uniformLocation("edgeLighting");
@@ -151,7 +154,7 @@ BlurEffect::BlurEffect()
 
     m_downsamplePass.shader = ShaderManager::instance()->generateShaderFromFile(ShaderTrait::MapTexture,
                                                                                 QStringLiteral(":/effects/glass/generated/vertex.vert"),
-                                                                                QStringLiteral(":/effects/glass/generated/downsample_core.frag"));
+                                                                                QStringLiteral(":/effects/glass/generated/downsample.frag"));
     if (!m_downsamplePass.shader) {
         qCWarning(KWIN_BLUR) << "Failed to load downsampling pass shader";
         return;
@@ -163,7 +166,7 @@ BlurEffect::BlurEffect()
 
     m_upsamplePass.shader = ShaderManager::instance()->generateShaderFromFile(ShaderTrait::MapTexture,
                                                                               QStringLiteral(":/effects/glass/generated/vertex.vert"),
-                                                                              QStringLiteral(":/effects/glass/generated/upsample_core.frag"));
+                                                                              QStringLiteral(":/effects/glass/generated/upsample.frag"));
     if (!m_upsamplePass.shader) {
         qCWarning(KWIN_BLUR) << "Failed to load upsampling pass shader";
         return;
@@ -175,8 +178,8 @@ BlurEffect::BlurEffect()
     }
 
     m_noisePass.shader = ShaderManager::instance()->generateShaderFromFile(ShaderTrait::MapTexture,
-                                                                           QStringLiteral(":/effects/glass/generated/vertex_core.vert"),
-                                                                           QStringLiteral(":/effects/glass/generated/noise_core.frag"));
+                                                                           QStringLiteral(":/effects/glass/generated/vertex.vert"),
+                                                                           QStringLiteral(":/effects/glass/generated/noise.frag"));
     if (!m_noisePass.shader) {
         qCWarning(KWIN_BLUR) << "Failed to load noise pass shader";
         return;
@@ -1367,6 +1370,7 @@ void BlurEffect::blur(const RenderTarget &renderTarget, const RenderViewport &vi
                                       0.5 / read->colorAttachment()->height());
             m_downsamplePass.shader->setUniform(m_downsamplePass.halfpixelLocation, halfpixel);
 
+            glActiveTexture(GL_TEXTURE0);
             read->colorAttachment()->bind();
 
             GLFramebuffer::pushFramebuffer(draw.get());
@@ -1393,6 +1397,7 @@ void BlurEffect::blur(const RenderTarget &renderTarget, const RenderViewport &vi
             m_upsamplePass.shader->setUniform(m_upsamplePass.halfpixelLocation, halfpixel);
             m_upsamplePass.shader->setUniform(m_upsamplePass.saturationCompensationLocation, i == 2 ? upsampleSaturationBoost : 1.0f);
 
+            glActiveTexture(GL_TEXTURE0);
             read->colorAttachment()->bind();
 
             vbo->draw(GL_TRIANGLES, 0, 6);
@@ -1446,6 +1451,7 @@ void BlurEffect::blur(const RenderTarget &renderTarget, const RenderViewport &vi
     m_roundedOnscreenPass.shader->setUniform(m_roundedOnscreenPass.boxLocation, QVector4D(nativeBox.x() + nativeBox.width() * 0.5, nativeBox.y() + nativeBox.height() * 0.5, nativeBox.width() * 0.5, nativeBox.height() * 0.5));
     m_roundedOnscreenPass.shader->setUniform(m_roundedOnscreenPass.cornerRadiusLocation, nativeCornerRadius.toVector());
     m_roundedOnscreenPass.shader->setUniform(m_roundedOnscreenPass.opacityLocation, modulation);
+    m_roundedOnscreenPass.shader->setUniform(m_roundedOnscreenPass.texUnitLocation, 0);
     m_roundedOnscreenPass.shader->setUniform(m_roundedOnscreenPass.blurSizeLocation, QVector2D(nativeBox.width(), nativeBox.height()));
     m_roundedOnscreenPass.shader->setUniform(m_roundedOnscreenPass.edgeSizePixelsLocation, m_settings.refraction.edgeSizePixels);
     m_roundedOnscreenPass.shader->setUniform(m_roundedOnscreenPass.refractionStrengthLocation, m_settings.refraction.refractionStrength);
@@ -1458,6 +1464,8 @@ void BlurEffect::blur(const RenderTarget &renderTarget, const RenderViewport &vi
     QColor tint(m_settings.general.tintColor);
     QVector3D tintVec(tint.redF(), tint.greenF(), tint.blueF());
     m_roundedOnscreenPass.shader->setUniform(m_roundedOnscreenPass.tintColorLocation, tintVec);
+    m_roundedOnscreenPass.shader->setUniform(m_roundedOnscreenPass.tintGrayLocation, static_cast<float>(0.299 * tint.redF() + 0.587 * tint.greenF() + 0.114 * tint.blueF()));
+    m_roundedOnscreenPass.shader->setUniform(m_roundedOnscreenPass.autoTintAlphaLocation, m_settings.general.autoTintAlpha ? 1 : 0);
     auto tintStrengthForRegion = [&](bool decorationRegion) {
         if (w->isDock() && m_settings.general.excludeDocks) {
             return 0.0f;
@@ -1496,6 +1504,7 @@ void BlurEffect::blur(const RenderTarget &renderTarget, const RenderViewport &vi
 
     auto drawBlurredRegion = [&](GLTexture *blurredTexture, int vertexOffset, int currentVertexCount, float blurOffset) {
         m_roundedOnscreenPass.shader->setUniform(m_roundedOnscreenPass.offsetLocation, blurOffset * m_upsampleOffset);
+        glActiveTexture(GL_TEXTURE0);
         blurredTexture->bind();
         vbo->draw(GL_TRIANGLES, vertexOffset, currentVertexCount);
     };
@@ -1514,6 +1523,7 @@ void BlurEffect::blur(const RenderTarget &renderTarget, const RenderViewport &vi
             m_noisePass.shader->setUniform(m_noisePass.mvpMatrixLocation, noiseProjectionMatrix);
             m_noisePass.shader->setUniform(m_noisePass.noiseTextureSizeLocation, QVector2D(noiseTexture->width(), noiseTexture->height()));
 
+            glActiveTexture(GL_TEXTURE0);
             noiseTexture->bind();
             vbo->draw(GL_TRIANGLES, vertexOffset, currentVertexCount);
 
@@ -1521,13 +1531,19 @@ void BlurEffect::blur(const RenderTarget &renderTarget, const RenderViewport &vi
         }
     };
 
+    const float contentTintStrength = tintStrengthForRegion(contentShape.isEmpty() && !frameShape.isEmpty());
+    const float frameTintStrength = tintStrengthForRegion(true);
+
     GLTexture *contentBlurredTexture = runBlurPass(splitBlurSettings ? contentBlurSettings : combinedBlurSettings);
-    m_roundedOnscreenPass.shader->setUniform(m_roundedOnscreenPass.tintStrengthLocation, tintStrengthForRegion(contentShape.isEmpty() && !frameShape.isEmpty()));
-    drawBlurredRegion(contentBlurredTexture, 6, contentVertexCount, splitBlurSettings ? contentBlurSettings.offset : combinedBlurSettings.offset);
+    m_roundedOnscreenPass.shader->setUniform(m_roundedOnscreenPass.tintStrengthLocation, contentTintStrength);
+    drawBlurredRegion(contentBlurredTexture,
+                      6,
+                      contentVertexCount,
+                      splitBlurSettings ? contentBlurSettings.offset : combinedBlurSettings.offset);
 
     if (splitRenderRegions && frameVertexCount > 0) {
         GLTexture *frameBlurredTexture = splitBlurSettings ? runBlurPass(m_decorationBlurSettings) : contentBlurredTexture;
-        m_roundedOnscreenPass.shader->setUniform(m_roundedOnscreenPass.tintStrengthLocation, tintStrengthForRegion(true));
+        m_roundedOnscreenPass.shader->setUniform(m_roundedOnscreenPass.tintStrengthLocation, frameTintStrength);
         drawBlurredRegion(frameBlurredTexture,
                           6 + contentVertexCount,
                           frameVertexCount,
