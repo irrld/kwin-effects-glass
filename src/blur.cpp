@@ -660,8 +660,8 @@ BorderRadius BlurEffect::effectiveWindowCornerRadius(EffectWindow *w, const Bord
     float topCornerRadius = 0.0;
     float bottomCornerRadius = 0.0;
     if (w->isOnScreenDisplay() || w->isTooltip()) {
-        topCornerRadius = m_settings.roundedCorners.windowTopRadius;
-        bottomCornerRadius = m_settings.roundedCorners.windowBottomRadius;
+        topCornerRadius = m_settings.roundedCorners.tooltipRadius;
+        bottomCornerRadius = m_settings.roundedCorners.tooltipRadius;
     } else if (w->isDock()) {
         topCornerRadius = m_settings.roundedCorners.dockRadius;
         bottomCornerRadius = m_settings.roundedCorners.dockRadius;

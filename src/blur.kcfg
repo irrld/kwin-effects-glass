@@ -93,6 +93,9 @@ org.kde.konsole</default>
         <entry name="MenuCornerRadius" type="Double">
             <default>0.0</default>
         </entry>
+        <entry name="TooltipCornerRadius" type="Double">
+            <default>0.0</default>
+        </entry>
         <entry name="DockCornerRadius" type="Double">
             <default>0.0</default>
         </entry>

@@ -1408,6 +1408,24 @@
             </layout>
            </item>
            <item>
+            <layout class="QHBoxLayout" name="layoutTooltipCornerRadius">
+             <item>
+              <widget class="QLabel" name="labelTooltipCornerRadius">
+               <property name="text">
+                <string>Tooltip and OSD corner radius</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QDoubleSpinBox" name="kcfg_TooltipCornerRadius">
+               <property name="minimum">
+                <double>0.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
             <layout class="QHBoxLayout" name="layoutDockCornerRadius">
              <item>
               <widget class="QLabel" name="labelDockCornerRadius">

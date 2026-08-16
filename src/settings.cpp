@@ -83,6 +83,7 @@ void BlurSettings::read()
     roundedCorners.windowTopRadius = BlurConfig::topCornerRadius();
     roundedCorners.windowBottomRadius = BlurConfig::bottomCornerRadius();
     roundedCorners.menuRadius = BlurConfig::menuCornerRadius();
+    roundedCorners.tooltipRadius = BlurConfig::tooltipCornerRadius();
     roundedCorners.dockRadius = BlurConfig::dockCornerRadius();
     roundedCorners.useDeclaredCornerRadius = BlurConfig::useDeclaredCornerRadius();
     roundedCorners.ignoreContentBlurRegion = BlurConfig::ignoreContentBlurRegion();

@@ -58,6 +58,7 @@ struct RoundedCornersSettings
     float windowTopRadius;
     float windowBottomRadius;
     float menuRadius;
+    float tooltipRadius;
     float dockRadius;
     bool useDeclaredCornerRadius;
     bool ignoreContentBlurRegion;

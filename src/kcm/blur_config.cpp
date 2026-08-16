@@ -40,6 +40,8 @@ BlurEffectConfig::BlurEffectConfig(QObject *parent, const KPluginMetaData &data)
         ui.kcfg_BottomCornerRadius->setEnabled(customCornerRadius);
         ui.labelMenuCornerRadius->setEnabled(customCornerRadius);
         ui.kcfg_MenuCornerRadius->setEnabled(customCornerRadius);
+        ui.labelTooltipCornerRadius->setEnabled(customCornerRadius);
+        ui.kcfg_TooltipCornerRadius->setEnabled(customCornerRadius);
         ui.labelDockCornerRadius->setEnabled(customCornerRadius);
         ui.kcfg_DockCornerRadius->setEnabled(customCornerRadius);
         ui.kcfg_RoundCornersOfMaximizedWindows->setEnabled(customCornerRadius);
